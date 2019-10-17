@@ -1,23 +1,14 @@
 # AWSServiceHealthNotification
+Notify the health status of "AWS Transfer for SFTP"  
 
-AWS Personal Health DashboardはAWS Transfer for SFTPをサポートしていない。
-そのため、そのサービスのステータスをAWS Service Health Dashboardから取得しメール通知する。
-
-動作仕様
-1. AWS CloudWatch Schedule Eventで起動されたAWS Lambda functionがAWS Personal Health Dashboardから情報(xml)を取得する。
-
-2｡ AWS Lambda functionは取得した情報(xml)から通知すべき情報があれば、AWS SNSを使ってmail通知する。
+The AWS Personal Health Dashboard does not support AWS Transfer for SFTP.  
+Therefore, the status of the service is obtained from the AWS Service Health Dashboard and notified by email.  
 
 
-Notify the health status of "AWS Transfer for SFTP"
+__Operating specifications__
+1. AWS Lambda function started by AWS CloudWatch Schedule Event gets information (xml) from AWS Service Health Dashboard.
+2. AWS Lambda function sends mail notification using AWS SNS if there is information(item) to be notified in the acquired information (rss).  
 
-AWS Transfer for SFTP is not supported by the AWS Personal Health Dashboard.
-Get the status of the service from the AWS Service Health Dashboard and send an email notification.
-
-Operating specifications
-1. AWS Lambda function started by AWS CloudWatch Schedule Event gets information (xml) from AWS Personal Health Dashboard.
-
-2. AWS Lambda function sends mail notification using AWS SNS if there is information to be notified from the acquired information (xml).
 
 ![](./images/AWSServiceHealthNotification.svg)  
 
@@ -32,6 +23,45 @@ Operating specifications
 
 These are the deployment steps until the full implementation is complete.:
 
+Locally, run following commands. 
+
+1. Set variables
+
+UPLOADBUCKETNAME:  
+Create S3Bucket to upload Lambda Function in advance.  
+Set BucketName to the following UPLOADBUCKETNAME.  
+
+MAILADDRESS:  
+Destination address for notifying Service Status.
+
+
+```bash
+$ PROJECTNAME=opstools
+$ ROLENAME=healthcheck
+$ UPLOADBUCKETNAME=xxxxxxxxxxxx
+$ MAILADDRESS=xxxxx@xxx.xxx
+
+```
+
+2. Upload local artifacts  
+```bash
+$ aws cloudformation package \
+    --template-file health_check.yaml \
+    --s3-bucket $UPLOADBUCKETNAME \
+    --output-template-file packaged.yml
+```
+
+3. Deploys the specified AWS CloudFormation template
+```bash
+$ aws cloudformation deploy \
+    --stack-name $PROJECTNAME-$ROLENAME \
+    --region ap-northeast-1 \
+    --template-file packaged.yml \
+    --capabilities CAPABILITY_NAMED_IAM \
+    --output text \
+    --parameter-overrides \
+        NortificationMail=$MAILADDRESS
+```
 
 
 ### RSS Sample from [AWS Service Health Dashboard](https://status.aws.amazon.com/)
