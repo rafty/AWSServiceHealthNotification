@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" version="1.1" viewBox="256.464 226 399.5462 280.672" width="399.5462" height="280.672">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" version="1.1" viewBox="256.464 226 409.1511 280.672" width="409.1511" height="280.672">
   <defs>
     <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 10 8" markerWidth="10" markerHeight="8" color="#666">
       <g>
@@ -19,11 +19,11 @@
     </font-face>
   </defs>
   <metadata> Produced by OmniGraffle 7.11.2 
-    <dc:date>2019-10-17 03:46:18 +0000</dc:date>
+    <dc:date>2019-10-17 06:30:58 +0000</dc:date>
   </metadata>
   <g id="キャンバス______1" stroke-dasharray="none" fill="none" stroke="none" fill-opacity="1" stroke-opacity="1">
-    <title>キャンバス 1</title>
-    <rect fill="white" x="256.464" y="226" width="399.5462" height="280.672"/>
+    <title>AWSServiceHealthNotification</title>
+    <rect fill="white" x="256.464" y="226" width="409.1511" height="280.672"/>
     <g id="キャンバス______1: レイヤー 1">
       <title>レイヤー 1</title>
       <g id="Group_5">
@@ -171,6 +171,12 @@
         <text transform="translate(511.892 403.832)" fill="black">
           <tspan font-family="Helvetica Neue" font-size="12" font-weight="400" fill="black" x="4.554" y="11">Publish</tspan>
           <tspan font-family="Helvetica Neue" font-size="12" font-weight="400" fill="black" x="0" y="25.336">Message</tspan>
+        </text>
+      </g>
+      <g id="Graphic_66">
+        <text transform="translate(594.3951 463)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="12" font-weight="400" fill="black" x="6.222" y="11">Amazon</tspan>
+          <tspan font-family="Helvetica Neue" font-size="12" font-weight="400" fill="black" x="5790923e-19" y="25.336">SNS Topic</tspan>
         </text>
       </g>
     </g>
