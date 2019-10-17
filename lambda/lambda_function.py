@@ -16,9 +16,6 @@ services = {
     "ap-northeast-1": {
         "Transfer for SFTP": 'https://status.aws.amazon.com/rss/transfer-ap-northeast-1.rss',
         "EC2": "https://status.aws.amazon.com/rss/ec2-ap-northeast-1.rss",
-        "S3": "https://status.aws.amazon.com/rss/s3-ap-northeast-1.rss",
-        "Lambda": "https://status.aws.amazon.com/rss/lambda-ap-northeast-1.rss",
-        "IoT": "https://status.aws.amazon.com/rss/awsiot-ap-northeast-1.rss"
     },
     "us-east-1": {
         "EC2": 'https://status.aws.amazon.com/rss/ec2-us-east-1.rss'
@@ -29,6 +26,8 @@ services = {
     }
 }
 
+
+# AWS Lambda environment variables
 SNS_TOPIC_ARN = os.environ['SNS_TOPIC_ARN']
 
 
@@ -92,10 +91,13 @@ def message_format(item, aws_service, region):
 
 
 def alert_service_status(items, aws_service, region):
-    # CloudWatch Logsに送る
-    # CloudWatch Scheduled Events 5分間隔
-    # 5分 × 2回分 = 600秒
-    # 直近10分以内のItemを通知する
+    """
+    - Send to CloudWatch Logs
+    - CloudWatch Scheduled Events every 5 minutes
+    - 5 minutes x 2 minutes = 600 seconds
+    - Notify Items within the last 10 minutes
+    """
+
     logger.info('xml: {}'.format(items))
 
     for item in items:
