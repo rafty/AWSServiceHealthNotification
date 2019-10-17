@@ -5,6 +5,7 @@ The AWS Personal Health Dashboard does not support AWS Transfer for SFTP.
 Therefore, the status of the service is obtained from the AWS Service Health Dashboard and notified by email.  
 
 
+
 __Operating specifications__
 1. AWS Lambda function started by AWS CloudWatch Schedule Event gets information (xml) from AWS Service Health Dashboard.
 2. AWS Lambda function sends mail notification using AWS SNS if there is information(item) to be notified in the acquired information (rss).  

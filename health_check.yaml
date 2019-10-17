@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  Lambda invoked in every 5 minites
+
+Parameters:
+  NortificationMail:
+    Description: Vpc Flow Logs Alarm
+    Type: String
+
+Resources:
+
+  HealthCheckLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: cloudwatchlogsPut
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+            - Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              Resource: "*"
+              Effect: Allow
+        - PolicyName: snspublish
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+            - Action:
+              - sns:Publish
+              # Resource: !Ref NotificationSystem
+              Resource: "*"
+              Effect: Allow
+
+  HealthCheckLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: health_check
+      Role: !GetAtt HealthCheckLambdaRole.Arn
+      Runtime: python3.7
+      Timeout: 300
+      Handler: lambda_function.lambda_handler
+      CodeUri: lambda/
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref AWSServiceErrorNotification
+
+  CloudWatchEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: every 5 minutes
+      Name: every5minutes
+      ScheduleExpression: cron(*/5 * * * ? *)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt HealthCheckLambda.Arn
+          Id: lambda-1
+
+  EventsInvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref HealthCheckLambda
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      # SourceAccount: !Ref AWS::AccountId
+      # CloudWatch EventではSourceAccountを使用しない
+      SourceArn: !GetAtt CloudWatchEventRule.Arn
+
+
+  AWSServiceErrorNotification:
+      Type: AWS::SNS::Topic
+      Properties:
+          DisplayName: AWSServiceErrorNotification
+          Subscription:
+              - Endpoint:
+                  Ref: NortificationMail
+                Protocol: email
+          TopicName: AWSServiceErrorNotification
