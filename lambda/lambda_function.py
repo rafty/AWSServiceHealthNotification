@@ -16,6 +16,7 @@ services = {
     "ap-northeast-1": {
         "Transfer for SFTP": 'https://status.aws.amazon.com/rss/transfer-ap-northeast-1.rss',
         "EC2": "https://status.aws.amazon.com/rss/ec2-ap-northeast-1.rss",
+        'CloudWatch': 'https://status.aws.amazon.com/rss/cloudwatch-ap-northeast-1.rss'
     },
     "us-east-1": {
         "EC2": 'https://status.aws.amazon.com/rss/ec2-us-east-1.rss'
@@ -30,9 +31,11 @@ services = {
 # AWS Lambda environment variables
 SNS_TOPIC_ARN = os.environ['SNS_TOPIC_ARN']
 
-
 def pub_date_to_utc(pub_date):
     # e.g. pub_date: Thu, 22 Aug 2019 23:40:01 PDT
+    #                Thu, 08 Mar 2012 14:11:41 PST
+    #                Thu, 08 Mar 2012 14:11:41 PCT
+
     logger.info('pub_date: {}'.format(pub_date))
     elements = pub_date.split(' ')
 
@@ -43,7 +46,7 @@ def pub_date_to_utc(pub_date):
         utc_time = datetime.strptime(_pub_date, '%d %b %Y %H:%M:%S %z').\
             astimezone(timezone.utc)
         return utc_time
-    elif elements[-1] == 'PCT':
+    elif elements[-1] == 'PCT' or elements[-1] == 'PST':
         _date = elements[1:-1]
         _date.append('-0800')
         _pub_date = ' '.join(_date)
@@ -65,7 +68,6 @@ def rss_read(url):
     }
     """
     root = et.fromstring(urllib.request.urlopen(url).read())
-
     items = list()
     for item in root.iter('item'):
         pub_date = pub_date_to_utc(item[2].text)
@@ -118,14 +120,14 @@ def alert_service_status(items, aws_service, region):
 def lambda_handler(event, context):
     logger.info('event: {}'.format(event))
     try:
-        region = 'ap-northeast-1'
-        aws_service = 'Transfer for SFTP'
-        items = rss_read(services.get(region).get(aws_service))
-        if len(items):
-            alert_service_status(items, aws_service, region)
-        else:
-            logger.info('Normal Operation: AWS Service {} in {}'.format(
-                aws_service, region))
+        for region, _items in services.items():
+            for aws_service, rss in _items.items():
+                items = rss_read(rss)
+                if len(items):
+                    alert_service_status(items, aws_service, region)
+                else:
+                    logger.info('Normal Operation: AWS Service {} in {}'.format(
+                        aws_service, region))
 
     except Exception as e:
         logger.error('Error: {}'.format(str(e)))
